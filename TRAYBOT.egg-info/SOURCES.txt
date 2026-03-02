@@ -1,0 +1,6 @@
+pyproject.toml
+TRAYBOT.egg-info/PKG-INFO
+TRAYBOT.egg-info/SOURCES.txt
+TRAYBOT.egg-info/dependency_links.txt
+TRAYBOT.egg-info/requires.txt
+TRAYBOT.egg-info/top_level.txt

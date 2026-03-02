@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: TRAYBOT
+Version: 0.1.0
+Summary: @trayvpn_bot
+Requires-Python: >=3.14
+Requires-Dist: requests>=2.25.0
+Requires-Dist: numpy
+Requires-Dist: aiogram>=3.13.1
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: pydantic-settings>=2.13.1
+Requires-Dist: sqlalchemy>=2.0.47
+Requires-Dist: aiosqlite>=0.22.0
+Requires-Dist: pytz>=2025.2
+Requires-Dist: apscheduler>=3.11.2
