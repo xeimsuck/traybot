@@ -6,12 +6,22 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import config
 import keyboards
 from database.requests import get_user_by_tg_id, get_device_by_id, rename_custom_device_name, create_new_device, \
-    delete_device_by_id
+    delete_device_by_id, update_user_balance
 from keyboards import get_top_up_list_keyboard
 from marzban_api import marzban_api
 from states import RenameDevice
 
 router = Router()
+
+install_link = {
+    "android": "https://play.google.com/store/apps/details?id=app.hiddify.com",
+    "ios": "https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532",
+    "macos": "https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532",
+    "windows": "https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-Windows-Setup-x64.exe",
+    "linux": "https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.deb",
+}
+
+
 
 
 # --- 1. ГЛАВНОЕ МЕНЮ УСТРОЙСТВ ---
@@ -69,24 +79,26 @@ async def show_device_details(callback: types.CallbackQuery):
         marzban_data = await marzban_api.get_user(device.marzban_username)
         status = "Активно 🟢" if marzban_data['status'] == 'active' else "Заблокировано 🔴"
         used_gb = round(marzban_data['used_traffic'] / (1024 ** 3), 2)
-        vless_link = next((link for link in marzban_data.get('links', []) if link.startswith('vless://')),
-                          "Ключ не найден")
+        sub_url = marzban_data.get('subscription_url')
+        if sub_url and not sub_url.startswith('http'):
+            sub_url = f"{config.marzban_url.get_secret_value()}{sub_url}#TrayVPN"
+
     except Exception:
         status = "Ошибка связи с сервером, попробуйте Обновить ⚠️"
         used_gb = 0
-        vless_link = "Недоступно"
+        sub_url = "Недоступно"
 
     text = (
         f"**Управление устройством: {device.custom_name}**\n\n"
         f"📄 Статус: {status}\n"
         f"💻 ОС: {device.os_type.capitalize()}\n"
         f"📊 Трафик: {used_gb} GB (безлимит)\n\n"
-        f"🔑 Ваш ключ для подключения:\n`{vless_link}`\n\n"
-        f"❓ Не знаешь как подключить? [Туториал](https://telegra.ph/Kak-podklyuchit-Tray-VPN-02-28)"
+        f"🔑 Скопируй ключ для подключения:\n`{sub_url}`\n\n"
+        f"📱 [Скачать Happ]({install_link[device.os_type.lower()]})"
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_devices.png",
+        media=f"{config.assets_url}/img/menu_{device.os_type.lower()}-install.png",
         caption=text,
         parse_mode="Markdown"
     )
@@ -170,7 +182,7 @@ async def process_create_device(callback: types.CallbackQuery):
     additional_device_price = config.additional_device_price
     total_devices = len(user.devices)
 
-    additional_device_month_price = config.one_day_price if total_devices<=3 else config.additional_device_price
+    additional_device_month_price = config.one_day_price if total_devices<3 else config.additional_device_price
 
     if total_devices == 0:
         month_price = 0.0
@@ -204,14 +216,14 @@ async def process_create_device(callback: types.CallbackQuery):
 
     await callback.answer("⏳ Создаем устройство...", show_alert=False)
 
-    # 1. Создаем устройство в нашей БД
+    # 1. Creating Device in bd
     device = await create_new_device(tg_id, os_type)
     if not device:
         return await callback.answer("Ошибка БД. Попробуйте позже.", show_alert=True)
+    else:
+        await update_user_balance(tg_id, -additional_device_month_price/30.0)
 
-    # 2. Создаем юзера в Marzban
-    # Так как подписка вечная (пока есть баланс), мы не ставим proxied_days (или ставим 0/None, зависит от твоей обертки API)
-    # data_limit тоже 0 (безлимит)
+    # 2. Creating Marzban User
     await marzban_api.create_user(
         username=device.marzban_username,
         proxied_days=None,  # Вечный профиль

@@ -3,7 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_
 from sqlalchemy import BigInteger, String, ForeignKey, DateTime, Boolean, Float
 from datetime import datetime, UTC
 
-engine = create_async_engine(url='sqlite+aiosqlite:///db.sqlite3')
+# Новая строка подключения для PostgreSQL через asyncpg
+DB_URL = "postgresql+asyncpg://xeim:mrGso6nQzX91pF@localhost:5432/vpn_bot_db"
+
+engine = create_async_engine(url=DB_URL)
 async_session = async_sessionmaker(engine)
 
 
@@ -45,7 +48,10 @@ class Device(Base):
     # Имя устройства для отображения юзеру (например: "Мой iPhone")
     custom_name: Mapped[str] = mapped_column(String(100))
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC)
+    )
 
     # Флаг активности конкретного устройства (можно дать юзеру возможность ставить на паузу)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

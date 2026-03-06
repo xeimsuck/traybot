@@ -12,3 +12,4 @@ Requires-Dist: sqlalchemy>=2.0.47
 Requires-Dist: aiosqlite>=0.22.0
 Requires-Dist: pytz>=2025.2
 Requires-Dist: apscheduler>=3.11.2
+Requires-Dist: asyncpg>=0.31.0

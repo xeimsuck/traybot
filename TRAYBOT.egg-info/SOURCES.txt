@@ -1,3 +1,4 @@
+README.md
 pyproject.toml
 TRAYBOT.egg-info/PKG-INFO
 TRAYBOT.egg-info/SOURCES.txt

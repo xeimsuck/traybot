@@ -7,3 +7,4 @@ sqlalchemy>=2.0.47
 aiosqlite>=0.22.0
 pytz>=2025.2
 apscheduler>=3.11.2
+asyncpg>=0.31.0
