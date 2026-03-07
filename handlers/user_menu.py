@@ -12,11 +12,13 @@ async def show_profile(callback: types.CallbackQuery):
     await callback.answer()
 
     user = await get_user_by_tg_id(callback.from_user.id)
+    if not user:
+        return await callback.answer("Ошибка пользователя")
 
     text = (
         f"**📃 Информация об аккаунте**\n"
         f"├ Уникальный ID: {user.tg_id}\n"
-        f"├ Баланс: {user.balance}₽\n"
+        f"├ Баланс: {round(user.balance, 2)}₽\n"
         f"└ Подключено устройств: {len(user.devices)}шт.\n"
         f"\n"
         f"**🎁 Ваша реферальная ссылка**\n"
@@ -26,7 +28,7 @@ async def show_profile(callback: types.CallbackQuery):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_cabinet.png",
+        media=f"{config.assets_url}/img/menu_cabinet.png?v=070326",
         caption=text,
         parse_mode="Markdown"
     )
@@ -60,7 +62,7 @@ async def bonus_system(callback: types.CallbackQuery):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_bonus-system.png",
+        media=f"{config.assets_url}/img/menu_bonus-system.png?v=070326",
         caption=text,
         parse_mode="Markdown"
     )

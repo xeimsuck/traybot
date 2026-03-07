@@ -10,3 +10,4 @@ services:
     network_mode: "host"
     volumes:
       - ./db_data:/app/database_folder
+      - ./logs:/app/logs

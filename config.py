@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     marzban_url: SecretStr
     marzban_admin_username: SecretStr
     marzban_admin_password: SecretStr
+    fk_api_key: SecretStr
+    fk_shop_id: SecretStr
     assets_url: str
     one_day_price: int
     additional_device_price: int

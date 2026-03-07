@@ -33,7 +33,7 @@ async def cmd_start(message: types.Message):
 
 
     await message.answer_photo(
-        photo=f"{config.assets_url}/img/menu_tray-vpn.png",
+        photo=f"{config.assets_url}/img/menu_tray-vpn.png?v=070326",
         caption=text,
         reply_markup = keyboards.get_main_keyboard()
     )
@@ -50,9 +50,9 @@ async def back_to_main(callback: types.CallbackQuery):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_tray-vpn.png",
+        media=f"{config.assets_url}/img/menu_tray-vpn.png?v=070326",
         caption=text,
-        parse_mode="Markdown"
+        parse_mode="HTML"
     )
 
     await callback.message.edit_media(

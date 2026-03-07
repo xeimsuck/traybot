@@ -6,7 +6,13 @@ from datetime import datetime, UTC
 # Новая строка подключения для PostgreSQL через asyncpg
 DB_URL = "postgresql+asyncpg://xeim:mrGso6nQzX91pF@localhost:5432/vpn_bot_db"
 
-engine = create_async_engine(url=DB_URL)
+engine = create_async_engine(
+    url=DB_URL,
+    pool_pre_ping=True,      # Пингует базу перед каждым запросом. Если соединение сдохло — пересоздает его.
+    pool_recycle=3600,       # Автоматически обновляет соединение каждый час.
+    pool_size=10,            # Сколько соединений держать открытыми.
+    max_overflow=20          # Сколько можно открыть сверх лимита при нагрузке.
+)
 async_session = async_sessionmaker(engine)
 
 

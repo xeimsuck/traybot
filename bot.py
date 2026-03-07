@@ -1,12 +1,17 @@
 import asyncio
-import logging
+import os
 from config import config
 from aiogram import Bot, Dispatcher
 from database.models import async_main
 from handlers import start, user_menu, devices, top_up
+from logger.logger import setup_logging
 from utils.billing import setup_billing
 
-logging.basicConfig(level=logging.INFO)
+
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+
 
 # Конфигурация
 BOT_TOKEN = config.bot_token.get_secret_value()
@@ -17,6 +22,7 @@ dp = Dispatcher()
 
 
 async def main():
+    setup_logging()
     await async_main()
     dp.include_router(start.router)
     dp.include_router(user_menu.router)

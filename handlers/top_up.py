@@ -8,6 +8,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import config
 from database.requests import get_user_by_tg_id
 from utils.math import get_daily_cost
+import html
 
 router = Router()
 
@@ -36,9 +37,9 @@ async def top_up(callback: types.CallbackQuery):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_top-up.png",
+        media=f"{config.assets_url}/img/menu_top-up.png?v=070326",
         caption=text,
-        parse_mode="Markdown"
+        parse_mode="HTML"
     )
 
     builder.row(types.InlineKeyboardButton(text="💸 Пополнить баланс", url="https://t.me/trayvpn_help"))

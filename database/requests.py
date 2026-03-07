@@ -1,4 +1,5 @@
 import datetime
+import logging
 import uuid
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -6,6 +7,8 @@ from sqlalchemy.orm import selectinload
 from config import config
 from marzban_api import marzban_api
 from .models import async_session, User, Device
+
+logger = logging.getLogger(__name__)
 
 async def create_user(tg_id, username, referred_by):
     async with async_session() as session:
@@ -18,10 +21,12 @@ async def create_user(tg_id, username, referred_by):
         session.add(new_user)
         try:
             await session.commit()
+            logger.info(f"[DB:CREATE_USER] Успешное создание пользователя {tg_id}")
             return True
         except Exception as e:
             # Лучше принтить ошибку, чтобы в будущем понимать, если база упадет по другой причине
-            print(f"Error creating user: {e}")
+            logger.exception(f"[DB:CREATE_USER] Неудачное создание пользователя {tg_id}")
+            logger.info(f"Error creating user: {e}")
             await session.rollback()
             return False
 
@@ -69,8 +74,10 @@ async def rename_custom_device_name(device_id: int, new_name: str):
     async with async_session() as session:
         device = await session.get(Device, device_id)
         if device:
+            old_name = device.custom_name
             device.custom_name = new_name
             await session.commit()
+            logger.info(f"[DB:CREATE_NEW_DEVICE] Пользователь переименовал {device} на {new_name} (старое {old_name})")
 
 async def create_new_device(tg_id: int, os_type: str) -> Device | None:
     async with async_session() as session:
@@ -99,6 +106,7 @@ async def create_new_device(tg_id: int, os_type: str) -> Device | None:
 
         session.add(new_device)
         await session.commit()
+        logger.info(f"[DB:CREATE_NEW_DEVICE] Пользователь {tg_id} добавил новое устройство")
 
         await session.refresh(new_device)
         return new_device

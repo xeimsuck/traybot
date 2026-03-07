@@ -1,3 +1,5 @@
+import html
+
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import types
 
@@ -43,7 +45,7 @@ def get_devices_keyboard(devices):
     for dev in devices:
         status_emoji = "🟢" if dev.is_active else "🔴"
         builder.row(types.InlineKeyboardButton(
-            text=f"{dev.custom_name} {status_emoji}",
+            text=f"{html.escape(dev.custom_name)} {status_emoji}",
             callback_data=f"dev_info_{dev.id}"
         ))
 

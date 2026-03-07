@@ -1,3 +1,5 @@
+import html
+
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InputMediaPhoto
@@ -54,9 +56,9 @@ async def show_devices(callback: types.CallbackQuery):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_connect.png",
+        media=f"{config.assets_url}/img/menu_connect.png?v=070326",
         caption=text,
-        parse_mode="Markdown"
+        parse_mode="HTML"
     )
 
     await callback.message.edit_media(
@@ -88,19 +90,23 @@ async def show_device_details(callback: types.CallbackQuery):
         used_gb = 0
         sub_url = "Недоступно"
 
+    safe_device_name = html.escape(device.custom_name)
+    safe_sub_url = html.escape(sub_url)
+    safe_install_link = html.escape(install_link[device.os_type.lower()])
+
     text = (
-        f"**Управление устройством: {device.custom_name}**\n\n"
+        f"<b>Управление устройством: {safe_device_name}</b>\n\n"
         f"📄 Статус: {status}\n"
         f"💻 ОС: {device.os_type.capitalize()}\n"
         f"📊 Трафик: {used_gb} GB (безлимит)\n\n"
-        f"🔑 Скопируй ключ для подключения:\n`{sub_url}`\n\n"
-        f"📱 [Скачать Happ]({install_link[device.os_type.lower()]})"
+        f"🔑 Скопируй ключ для подключения:\n<code>{safe_sub_url}</code>\n\n"
+        f"📱 <a href='{safe_install_link}'>Скачать Happ</a>"
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_{device.os_type.lower()}-install.png",
+        media=f"{config.assets_url}/img/menu_{device.os_type.lower()}-install.png?v=070326",
         caption=text,
-        parse_mode="Markdown"
+        parse_mode="HTML"
     )
 
     builder = InlineKeyboardBuilder()
@@ -110,7 +116,7 @@ async def show_device_details(callback: types.CallbackQuery):
     builder.row(types.InlineKeyboardButton(text="⬅️ К списку устройств", callback_data="devices"))
 
     await callback.answer()
-    await callback.message.edit_media(media=new_media, reply_markup=builder.as_markup(), parse_mode="Markdown")
+    await callback.message.edit_media(media=new_media, reply_markup=builder.as_markup())
 
 
 # --- 3. ПЕРЕИМЕНОВАНИЕ УСТРОЙСТВА ---
@@ -131,7 +137,7 @@ async def rename_dev_finish(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await rename_custom_device_name(data.get("dev_to_rename"), new_name)
     await state.clear()
-    await message.answer(f"✅ Готово! Устройство переименовано в: **{new_name}**", parse_mode="Markdown")
+    await message.answer(f"✅ Готово! Устройство переименовано в: <b>{html.escape(new_name)}</b>", parse_mode="HTML")
 
 
 # --- 4. МЕНЮ ДОБАВЛЕНИЯ НОВОГО УСТРОЙСТВА ---
@@ -158,7 +164,7 @@ async def add_device_menu(callback: types.CallbackQuery):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_connect.png",
+        media=f"{config.assets_url}/img/menu_connect.png?v=070326",
         caption=text,
         parse_mode="Markdown"
     )
@@ -166,7 +172,6 @@ async def add_device_menu(callback: types.CallbackQuery):
     await callback.message.edit_media(
         media=new_media,
         reply_markup=keyboards.get_os_selection_keyboard(),
-        parse_mode="Markdown"
     )
 
 
@@ -203,14 +208,13 @@ async def process_create_device(callback: types.CallbackQuery):
         )
 
         new_media = InputMediaPhoto(
-            media=f"{config.assets_url}/img/menu_top-up.png",
+            media=f"{config.assets_url}/img/menu_top-up.png?v=070326",
             caption=text,
             parse_mode="Markdown"
         )
 
         await callback.message.edit_media(
             media=new_media,
-            parse_mode="Markdown",
             reply_markup=get_top_up_list_keyboard(month_price)
         )
 
@@ -238,7 +242,7 @@ async def process_create_device(callback: types.CallbackQuery):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_connect.png",
+        media=f"{config.assets_url}/img/menu_connect.png?v=070326",
         caption=text,
         parse_mode="Markdown"
     )
@@ -248,7 +252,6 @@ async def process_create_device(callback: types.CallbackQuery):
 
     await callback.message.edit_media(
         media=new_media,
-        parse_mode="Markdown",
         reply_markup=builder.as_markup()
     )
 
@@ -263,13 +266,13 @@ async def rename_dev_start(callback: types.CallbackQuery, state: FSMContext):
         return
 
     text = (
-        f"Вы уверены что хотите удалить устройство: _{device.custom_name}_?\n\n"
+        f"Вы уверены что хотите удалить устройство: <i>{html.escape(device.custom_name)}</i>?\n\n"
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_delete-device.png",
+        media=f"{config.assets_url}/img/menu_delete-device.png?v=070326",
         caption=text,
-        parse_mode="Markdown"
+        parse_mode="HTML"
     )
 
     builder = InlineKeyboardBuilder()
@@ -278,7 +281,6 @@ async def rename_dev_start(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.message.edit_media(
         media=new_media,
-        parse_mode="Markdown",
         reply_markup=builder.as_markup()
     )
 
@@ -295,7 +297,7 @@ async def rename_dev_start(callback: types.CallbackQuery, state: FSMContext):
     )
 
     new_media = InputMediaPhoto(
-        media=f"{config.assets_url}/img/menu_successful.png",
+        media=f"{config.assets_url}/img/menu_successful.png?v=070326",
         caption=text,
         parse_mode="Markdown"
     )
